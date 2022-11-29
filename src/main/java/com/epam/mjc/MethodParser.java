@@ -1,5 +1,10 @@
 package com.epam.mjc;
 
+import java.security.Signature;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
+
 public class MethodParser {
 
     /**
@@ -20,6 +25,29 @@ public class MethodParser {
      * @return {@link MethodSignature} object filled with parsed values from source string
      */
     public MethodSignature parseFunction(String signatureString) {
-        throw new UnsupportedOperationException("You should implement this method.");
+        StringTokenizer stringTokenizer = new StringTokenizer(signatureString,"(");
+        StringSplitter stringSplitter = new StringSplitter();
+        List <String> delimiter  = new ArrayList();
+        delimiter.add(" ");
+        delimiter.add(")");
+        delimiter.add("(");
+
+        List <String> methodDesc = stringSplitter.splitByDelimiters(stringTokenizer.nextToken(),delimiter);
+        List <String> arguments = stringSplitter.splitByDelimiters(stringTokenizer.nextToken(),delimiter);
+        return assignValues(methodDesc,arguments);
+    }
+
+    private MethodSignature assignValues (List <String> methodDesc, List <String> arguments ){
+        List <MethodSignature.Argument> args = new ArrayList<>();
+        for (int i=0; i<arguments.size()-1; i+=2){
+            MethodSignature.Argument temp = new MethodSignature.Argument (arguments.get(i),arguments.get(i+1));
+            args.add(temp);
+        }
+
+        MethodSignature result = new MethodSignature(methodDesc.get(methodDesc.size()-1),args);
+        result.setReturnType(methodDesc.get(methodDesc.size()-2));
+        result.setAccessModifier(methodDesc.size()>2 ? methodDesc.get(0):null);
+
+        return result;
     }
 }
